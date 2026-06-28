@@ -125,6 +125,11 @@ header h1 em{color:var(--gold);font-style:normal;}
 .ko-date{font-size:9px;color:var(--white);font-weight:600;}
 .ko-venue{font-size:8px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .trophy-col{text-align:center;padding:0 8px;}
+.trophy-img-wrap{position:relative;display:flex;justify-content:center;margin-bottom:4px;}
+.trophy-img{height:120px;width:auto;object-fit:contain;filter:drop-shadow(0 0 20px rgba(245,197,24,.8)) drop-shadow(0 0 40px rgba(245,197,24,.4));transition:transform .3s;}
+.trophy-img:hover{transform:scale(1.05);}
+.trophy-fallback{font-size:52px;display:none;filter:drop-shadow(0 0 16px var(--gold));}
+.champ-trophy-img{height:80px;width:auto;object-fit:contain;filter:drop-shadow(0 0 12px rgba(245,197,24,.7));}
 .trophy-emoji{font-size:52px;display:block;filter:drop-shadow(0 0 16px var(--gold));}
 .final-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-top:4px;}
 .final-venue{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:2px;line-height:1.4;}
@@ -218,7 +223,12 @@ header h1 em{color:var(--gold);font-style:normal;}
   </div>
   <div style="padding:24px 16px 0;">
     <div class="champ-box">
-      <div class="champ-trophy">🏆</div>
+      <div class="champ-trophy">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/FIFA_World_Cup_Trophy_2010.jpg/120px-FIFA_World_Cup_Trophy_2010.jpg"
+          alt="FIFA World Cup Trophy" class="champ-trophy-img"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span style="display:none;font-size:48px">🏆</span>
+      </div>
       <div class="champ-lbl">World Cup 2026 Champion</div>
       <div class="champ-row">
         <input class="champ-flag" id="champFlag" type="text" placeholder="🏳️" maxlength="4" oninput="saveChamp()">
@@ -266,7 +276,7 @@ const GD = [
   {id:'A',status:'done',teams:[
     {name:'Mexico',       flag:'🇲🇽',mp:3,w:3,d:0,l:0,gf:6, ga:1, pts:9, st:'q',host:true},
     {name:'South Africa', flag:'🇿🇦',mp:3,w:1,d:1,l:1,gf:2, ga:3, pts:4, st:'q'},
-    {name:'South Korea',  flag:'🇰🇷',mp:3,w:1,d:0,l:2,gf:2, ga:3, pts:3, st:'b'},
+    {name:'South Korea',  flag:'🇰🇷',mp:3,w:1,d:0,l:2,gf:2, ga:3, pts:3, st:'e'},
     {name:'Czechia',      flag:'🇨🇿',mp:3,w:0,d:1,l:2,gf:2, ga:5, pts:1, st:'e'},
   ],matches:[
     {h:'Mexico',      a:'South Africa',hs:2, as:0,date:'Jun 11',time:'',venue:''},
@@ -279,7 +289,7 @@ const GD = [
   {id:'B',status:'done',teams:[
     {name:'Switzerland',   flag:'🇨🇭',mp:3,w:2,d:1,l:0,gf:8,ga:3,pts:7,st:'q'},
     {name:'Canada',        flag:'🇨🇦',mp:3,w:1,d:1,l:1,gf:8,ga:5,pts:4,st:'q',host:true},
-    {name:'Bosnia & Herz.',flag:'🇧🇦',mp:3,w:0,d:2,l:1,gf:5,ga:8,pts:2,st:'e'},
+    {name:'Bosnia & Herz.',flag:'🇧🇦',mp:3,w:0,d:2,l:1,gf:5,ga:8,pts:2,st:'b'},
     {name:'Qatar',         flag:'🇶🇦',mp:3,w:0,d:0,l:3,gf:2,ga:8,pts:0,st:'e'},
   ],matches:[
     {h:'Canada',        a:'Bosnia & Herz.',hs:1,as:1,date:'Jun 12',time:'',venue:''},
@@ -292,7 +302,7 @@ const GD = [
   {id:'C',status:'done',teams:[
     {name:'Brazil',  flag:'🇧🇷',mp:3,w:2,d:1,l:0,gf:5,ga:1,pts:7,st:'q'},
     {name:'Morocco', flag:'🇲🇦',mp:3,w:2,d:1,l:0,gf:3,ga:1,pts:7,st:'q'},
-    {name:'Scotland',flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',mp:3,w:1,d:0,l:2,gf:1,ga:2,pts:3,st:'b'},
+    {name:'Scotland',flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',mp:3,w:1,d:0,l:2,gf:1,ga:2,pts:3,st:'e'},
     {name:'Haiti',   flag:'🇭🇹',mp:3,w:0,d:0,l:3,gf:0,ga:5,pts:0,st:'e'},
   ],matches:[
     {h:'Brazil',  a:'Morocco', hs:1,as:1,date:'Jun 13',time:'',venue:''},
@@ -344,7 +354,7 @@ const GD = [
   {id:'G',status:'done',teams:[
     {name:'Belgium',    flag:'🇧🇪',mp:3,w:1,d:2,l:0,gf:6,ga:2,pts:5,st:'q'},
     {name:'Egypt',      flag:'🇪🇬',mp:3,w:1,d:2,l:0,gf:5,ga:3,pts:5,st:'q'},
-    {name:'Iran',       flag:'🇮🇷',mp:3,w:0,d:2,l:1,gf:2,ga:3,pts:2,st:'b'},
+    {name:'Iran',       flag:'🇮🇷',mp:3,w:0,d:2,l:1,gf:2,ga:3,pts:2,st:'e'},
     {name:'New Zealand',flag:'🇳🇿',mp:3,w:0,d:0,l:3,gf:3,ga:8,pts:0,st:'e'},
   ],matches:[
     {h:'Belgium',    a:'Egypt',       hs:1,as:1,date:'Jun 15',time:'',venue:''},
@@ -357,7 +367,7 @@ const GD = [
   {id:'H',status:'done',teams:[
     {name:'Spain',       flag:'🇪🇸',mp:3,w:2,d:1,l:0,gf:5,ga:1,pts:7,st:'q'},
     {name:'Cape Verde',  flag:'🇨🇻',mp:3,w:0,d:3,l:0,gf:2,ga:2,pts:3,st:'q'},
-    {name:'Uruguay',     flag:'🇺🇾',mp:3,w:0,d:2,l:1,gf:3,ga:4,pts:2,st:'b'},
+    {name:'Uruguay',     flag:'🇺🇾',mp:3,w:0,d:2,l:1,gf:3,ga:4,pts:2,st:'e'},
     {name:'Saudi Arabia',flag:'🇸🇦',mp:3,w:0,d:2,l:1,gf:1,ga:4,pts:2,st:'e'},
   ],matches:[
     {h:'Spain',       a:'Cape Verde',   hs:0,as:0,date:'Jun 15',time:'',venue:''},
@@ -380,44 +390,44 @@ const GD = [
     {h:'Norway', a:'France', hs:1, as:4,date:'Jun 26',time:'',venue:''},
     {h:'Senegal',a:'Iraq',   hs:5, as:0,date:'Jun 26',time:'',venue:''},
   ]},
-  {id:'J',status:'active',teams:[
-    {name:'Argentina',flag:'🇦🇷',mp:2,w:2,d:0,l:0,gf:5,ga:0,pts:6,st:'q'},
-    {name:'Austria',  flag:'🇦🇹',mp:2,w:1,d:0,l:1,gf:3,ga:4,pts:3,st:'b'},
-    {name:'Algeria',  flag:'🇩🇿',mp:2,w:1,d:0,l:1,gf:2,ga:4,pts:3,st:'b'},
-    {name:'Jordan',   flag:'🇯🇴',mp:2,w:0,d:0,l:2,gf:2,ga:4,pts:0,st:'e'},
+  {id:'J',status:'done',teams:[
+    {name:'Argentina',flag:'🇦🇷',mp:3,w:3,d:0,l:0,gf:8, ga:1,pts:9,st:'q'},
+    {name:'Algeria',  flag:'🇩🇿',mp:3,w:1,d:1,l:1,gf:5, ga:7,pts:4,st:'q'},
+    {name:'Austria',  flag:'🇦🇹',mp:3,w:1,d:1,l:1,gf:6, ga:7,pts:4,st:'b'},
+    {name:'Jordan',   flag:'🇯🇴',mp:3,w:0,d:0,l:3,gf:3, ga:7,pts:0,st:'e'},
   ],matches:[
-    {h:'Argentina',a:'Algeria', hs:3,   as:0,   date:'Jun 16',time:'',venue:''},
-    {h:'Austria',  a:'Jordan',  hs:3,   as:1,   date:'Jun 17',time:'',venue:''},
-    {h:'Argentina',a:'Austria', hs:2,   as:0,   date:'Jun 22',time:'',venue:''},
-    {h:'Jordan',   a:'Algeria', hs:1,   as:2,   date:'Jun 22',time:'',venue:''},
-    {h:'Algeria',  a:'Austria', hs:null,as:null, date:'Jun 27',time:'10:00 PM ET',venue:'Arrowhead Stadium, Kansas City'},
-    {h:'Jordan',   a:'Argentina',hs:null,as:null,date:'Jun 27',time:'10:00 PM ET',venue:'AT&T Stadium, Arlington'},
+    {h:'Argentina',a:'Algeria',  hs:3,as:0,date:'Jun 16',time:'',venue:''},
+    {h:'Austria',  a:'Jordan',   hs:3,as:1,date:'Jun 17',time:'',venue:''},
+    {h:'Argentina',a:'Austria',  hs:2,as:0,date:'Jun 22',time:'',venue:''},
+    {h:'Jordan',   a:'Algeria',  hs:1,as:2,date:'Jun 22',time:'',venue:''},
+    {h:'Austria',  a:'Algeria',  hs:3,as:3,date:'Jun 27',time:'10:00 PM ET',venue:'Arrowhead Stadium, Kansas City'},
+    {h:'Argentina',a:'Jordan',   hs:3,as:1,date:'Jun 27',time:'10:00 PM ET',venue:'AT&T Stadium, Arlington'},
   ]},
-  {id:'K',status:'active',teams:[
-    {name:'Colombia',  flag:'🇨🇴',mp:2,w:2,d:0,l:0,gf:4,ga:1,pts:6,st:'q'},
-    {name:'Portugal',  flag:'🇵🇹',mp:2,w:1,d:1,l:0,gf:6,ga:1,pts:4,st:'q'},
-    {name:'DR Congo',  flag:'🇨🇩',mp:2,w:0,d:1,l:1,gf:1,ga:4,pts:1,st:'b'},
-    {name:'Uzbekistan',flag:'🇺🇿',mp:2,w:0,d:0,l:2,gf:1,ga:6,pts:0,st:'e'},
+  {id:'K',status:'done',teams:[
+    {name:'Colombia',  flag:'🇨🇴',mp:3,w:2,d:1,l:0,gf:4, ga:1,pts:7,st:'q'},
+    {name:'Portugal',  flag:'🇵🇹',mp:3,w:1,d:2,l:0,gf:6, ga:1,pts:5,st:'q'},
+    {name:'DR Congo',  flag:'🇨🇩',mp:3,w:1,d:1,l:1,gf:4, ga:5,pts:4,st:'b'},
+    {name:'Uzbekistan',flag:'🇺🇿',mp:3,w:0,d:0,l:3,gf:2, ga:9,pts:0,st:'e'},
   ],matches:[
-    {h:'Portugal',  a:'DR Congo',   hs:1,   as:1,   date:'Jun 17',time:'',venue:''},
-    {h:'Colombia',  a:'Uzbekistan', hs:3,   as:1,   date:'Jun 17',time:'',venue:''},
-    {h:'Portugal',  a:'Uzbekistan', hs:5,   as:0,   date:'Jun 23',time:'',venue:''},
-    {h:'Colombia',  a:'DR Congo',   hs:1,   as:0,   date:'Jun 23',time:'',venue:''},
-    {h:'Colombia',  a:'Portugal',   hs:null,as:null, date:'Jun 27',time:'7:30 PM ET',venue:'Hard Rock Stadium, Miami'},
-    {h:'DR Congo',  a:'Uzbekistan', hs:null,as:null, date:'Jun 27',time:'7:30 PM ET',venue:'Mercedes-Benz Stadium, Atlanta'},
+    {h:'Portugal',  a:'DR Congo',   hs:1,as:1,date:'Jun 17',time:'',venue:''},
+    {h:'Colombia',  a:'Uzbekistan', hs:3,as:1,date:'Jun 17',time:'',venue:''},
+    {h:'Portugal',  a:'Uzbekistan', hs:5,as:0,date:'Jun 23',time:'',venue:''},
+    {h:'Colombia',  a:'DR Congo',   hs:1,as:0,date:'Jun 23',time:'',venue:''},
+    {h:'Colombia',  a:'Portugal',   hs:0,as:0,date:'Jun 27',time:'7:30 PM ET',venue:'Hard Rock Stadium, Miami'},
+    {h:'DR Congo',  a:'Uzbekistan', hs:3,as:1,date:'Jun 27',time:'7:30 PM ET',venue:'Mercedes-Benz Stadium, Atlanta'},
   ]},
-  {id:'L',status:'active',teams:[
-    {name:'England',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',mp:2,w:1,d:1,l:0,gf:4,ga:2,pts:4,st:'q'},
-    {name:'Croatia',flag:'🇭🇷',mp:2,w:1,d:0,l:1,gf:3,ga:4,pts:3,st:'b'},
-    {name:'Ghana',  flag:'🇬🇭',mp:2,w:0,d:1,l:1,gf:1,ga:1,pts:1,st:'b'},
-    {name:'Panama', flag:'🇵🇦',mp:2,w:0,d:0,l:2,gf:0,ga:1,pts:0,st:'e'},
+  {id:'L',status:'done',teams:[
+    {name:'England',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',mp:3,w:2,d:1,l:0,gf:6,ga:2,pts:7,st:'q'},
+    {name:'Croatia',flag:'🇭🇷',mp:3,w:2,d:0,l:1,gf:5,ga:4,pts:6,st:'q'},
+    {name:'Ghana',  flag:'🇬🇭',mp:3,w:1,d:1,l:1,gf:2,ga:3,pts:4,st:'b'},
+    {name:'Panama', flag:'🇵🇦',mp:3,w:0,d:0,l:3,gf:0,ga:4,pts:0,st:'e'},
   ],matches:[
-    {h:'England',a:'Croatia',hs:4,   as:2,   date:'Jun 17',time:'',venue:''},
-    {h:'Ghana',  a:'Panama', hs:1,   as:0,   date:'Jun 17',time:'',venue:''},
-    {h:'England',a:'Ghana',  hs:0,   as:0,   date:'Jun 23',time:'',venue:''},
-    {h:'Croatia',a:'Panama', hs:1,   as:0,   date:'Jun 23',time:'',venue:''},
-    {h:'Panama', a:'England',hs:null,as:null, date:'Jun 27',time:'5:00 PM ET',venue:'MetLife Stadium, NJ'},
-    {h:'Croatia',a:'Ghana',  hs:null,as:null, date:'Jun 27',time:'5:00 PM ET',venue:'Lincoln Financial Field, Philadelphia'},
+    {h:'England',a:'Croatia',hs:4,as:2,date:'Jun 17',time:'',venue:''},
+    {h:'Ghana',  a:'Panama', hs:1,as:0,date:'Jun 17',time:'',venue:''},
+    {h:'England',a:'Ghana',  hs:0,as:0,date:'Jun 23',time:'',venue:''},
+    {h:'Croatia',a:'Panama', hs:1,as:0,date:'Jun 23',time:'',venue:''},
+    {h:'Panama', a:'England',hs:0,as:2,date:'Jun 27',time:'5:00 PM ET',venue:'MetLife Stadium, NJ'},
+    {h:'Croatia',a:'Ghana',  hs:2,as:1,date:'Jun 27',time:'5:00 PM ET',venue:'Lincoln Financial Field, Philadelphia'},
   ]},
 ];
 
@@ -428,38 +438,38 @@ function km(label,hh,ah,date,time,venue){
 }
 const KD_DEFAULT = {
   r32:[
-    {label:'R32-1', homeHint:'South Africa',       awayHint:'Canada',                     date:'Sun Jun 28',time:'3:00 PM ET', venue:'SoFi Stadium, Los Angeles',
-      home:{name:'South Africa',flag:'🇿🇦',score:''},away:{name:'Canada',       flag:'🇨🇦',score:''},winner:''},
-    {label:'R32-2', homeHint:'Germany',             awayHint:'Best 3rd (A/B/C/D/F)',       date:'Mon Jun 29',time:'4:30 PM ET', venue:'Gillette Stadium, Boston',
-      home:{name:'Germany',    flag:'🇩🇪',score:''},away:{name:'Paraguay',     flag:'🇵🇾',score:''},winner:''},
-    {label:'R32-3', homeHint:'Netherlands',         awayHint:'Morocco',                    date:'Tue Jun 30',time:'9:00 PM ET', venue:'Estadio BBVA, Monterrey',
-      home:{name:'Netherlands',flag:'🇳🇱',score:''},away:{name:'Morocco',      flag:'🇲🇦',score:''},winner:''},
-    {label:'R32-4', homeHint:'France',              awayHint:'Best 3rd (C/D/F/G/H)',       date:'Tue Jun 30',time:'5:00 PM ET', venue:'MetLife Stadium, NJ',
-      home:{name:'France',     flag:'🇫🇷',score:''},away:{name:'Sweden',       flag:'🇸🇪',score:''},winner:''},
-    {label:'R32-5', homeHint:'England (Grp L W)',   awayHint:'Best 3rd (E/H/I/J/K)',       date:'Wed Jul 1', time:'12:00 PM ET',venue:'Mercedes-Benz Stadium, Atlanta',
-      home:{name:'England',    flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',score:''},away:{name:'Senegal',      flag:'🇸🇳',score:''},winner:''},
-    {label:'R32-6', homeHint:'Belgium (Grp G W)',   awayHint:'Best 3rd (A/E/H/I/J)',       date:'Wed Jul 1', time:'4:00 PM ET', venue:'Lumen Field, Seattle',
-      home:{name:'Belgium',    flag:'🇧🇪',score:''},away:{name:'Bosnia & Herz.',flag:'🇧🇦',score:''},winner:''},
-    {label:'R32-7', homeHint:'USA',                 awayHint:'Bosnia & Herz.',             date:'Wed Jul 1', time:'8:00 PM ET', venue:"Levi's Stadium, San Francisco",
-      home:{name:'USA',        flag:'🇺🇸',score:''},away:{name:'Bosnia & Herz.',flag:'🇧🇦',score:''},winner:''},
-    {label:'R32-8', homeHint:'Spain (Grp H W)',     awayHint:'Grp J Runner-up',            date:'Thu Jul 2', time:'3:00 PM ET', venue:'SoFi Stadium, Los Angeles',
-      home:{name:'Spain',      flag:'🇪🇸',score:''},away:{name:'Austria',      flag:'🇦🇹',score:''},winner:''},
-    {label:'R32-9', homeHint:'Brazil',              awayHint:'Japan',                      date:'Mon Jun 29',time:'1:00 PM ET', venue:'NRG Stadium, Houston',
-      home:{name:'Brazil',     flag:'🇧🇷',score:''},away:{name:'Japan',        flag:'🇯🇵',score:''},winner:''},
-    {label:'R32-10',homeHint:'Ivory Coast',         awayHint:'Norway',                     date:'Tue Jun 30',time:'1:00 PM ET', venue:'AT&T Stadium, Arlington',
-      home:{name:'Ivory Coast',flag:'🇨🇮',score:''},away:{name:'Norway',       flag:'🇳🇴',score:''},winner:''},
-    {label:'R32-11',homeHint:'Mexico',              awayHint:'Best 3rd (C/E/F/H/I)',       date:'Wed Jul 1', time:'9:00 PM ET', venue:'Estadio Azteca, Mexico City',
-      home:{name:'Mexico',     flag:'🇲🇽',score:''},away:{name:'Ecuador',      flag:'🇪🇨',score:''},winner:''},
-    {label:'R32-12',homeHint:'Egypt (Grp G W)',     awayHint:'Best 3rd (A/E/H/I/J)',       date:'Thu Jul 2', time:'7:00 PM ET', venue:'Lumen Field, Seattle',
-      home:{name:'Egypt',      flag:'🇪🇬',score:''},away:{name:'Scotland',     flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',score:''},winner:''},
-    {label:'R32-13',homeHint:'Argentina',           awayHint:'Cape Verde (Grp H 2nd)',     date:'Fri Jul 3', time:'6:00 PM ET', venue:'Hard Rock Stadium, Miami',
-      home:{name:'Argentina',  flag:'🇦🇷',score:''},away:{name:'Cape Verde',   flag:'🇨🇻',score:''},winner:''},
-    {label:'R32-14',homeHint:'Australia (Grp D 2nd)',awayHint:'Egypt',                     date:'Fri Jul 3', time:'2:00 PM ET', venue:'AT&T Stadium, Arlington',
-      home:{name:'Australia',  flag:'🇦🇺',score:''},away:{name:'Egypt',        flag:'🇪🇬',score:''},winner:''},
-    {label:'R32-15',homeHint:'Switzerland',         awayHint:'Best 3rd (E/F/G/I/J)',       date:'Fri Jul 3', time:'8:00 PM ET', venue:'BC Place, Vancouver',
-      home:{name:'Switzerland',flag:'🇨🇭',score:''},away:{name:'Sweden',       flag:'🇸🇪',score:''},winner:''},
-    {label:'R32-16',homeHint:'Colombia (Grp K W)',  awayHint:'Best 3rd (D/E/I/J/L)',       date:'Sat Jul 4', time:'9:30 PM ET', venue:'Arrowhead Stadium, Kansas City',
-      home:{name:'Colombia',   flag:'🇨🇴',score:''},away:{name:'Senegal',      flag:'🇸🇳',score:''},winner:''},
+    {label:'R32-1', homeHint:'Canada',           awayHint:'South Africa',          date:'Sun Jun 28',time:'3:00 PM ET', venue:'SoFi Stadium, Los Angeles',
+      home:{name:'Canada',       flag:'🇨🇦',score:''},away:{name:'South Africa', flag:'🇿🇦',score:''},winner:''},
+    {label:'R32-2', homeHint:'Germany',           awayHint:'Paraguay',              date:'Mon Jun 29',time:'4:30 PM ET', venue:'Gillette Stadium, Boston',
+      home:{name:'Germany',      flag:'🇩🇪',score:''},away:{name:'Paraguay',      flag:'🇵🇾',score:''},winner:''},
+    {label:'R32-3', homeHint:'Netherlands',       awayHint:'Morocco',               date:'Mon Jun 29',time:'9:00 PM ET', venue:'Estadio BBVA, Monterrey',
+      home:{name:'Netherlands',  flag:'🇳🇱',score:''},away:{name:'Morocco',       flag:'🇲🇦',score:''},winner:''},
+    {label:'R32-4', homeHint:'France',            awayHint:'Sweden',                date:'Tue Jun 30',time:'5:00 PM ET', venue:'MetLife Stadium, NJ',
+      home:{name:'France',       flag:'🇫🇷',score:''},away:{name:'Sweden',        flag:'🇸🇪',score:''},winner:''},
+    {label:'R32-5', homeHint:'Mexico',            awayHint:'Ecuador',               date:'Tue Jun 30',time:'9:00 PM ET', venue:'Estadio Azteca, Mexico City',
+      home:{name:'Mexico',       flag:'🇲🇽',score:''},away:{name:'Ecuador',       flag:'🇪🇨',score:''},winner:''},
+    {label:'R32-6', homeHint:'England',           awayHint:'DR Congo',              date:'Wed Jul 1', time:'12:00 PM ET',venue:'Mercedes-Benz Stadium, Atlanta',
+      home:{name:'England',      flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',score:''},away:{name:'DR Congo',      flag:'🇨🇩',score:''},winner:''},
+    {label:'R32-7', homeHint:'Belgium',           awayHint:'Senegal',               date:'Wed Jul 1', time:'4:00 PM ET', venue:'Lumen Field, Seattle',
+      home:{name:'Belgium',      flag:'🇧🇪',score:''},away:{name:'Senegal',       flag:'🇸🇳',score:''},winner:''},
+    {label:'R32-8', homeHint:'USA',               awayHint:'Bosnia & Herz.',        date:'Wed Jul 1', time:'8:00 PM ET', venue:"Levi's Stadium, San Francisco",
+      home:{name:'USA',          flag:'🇺🇸',score:''},away:{name:'Bosnia & Herz.',flag:'🇧🇦',score:''},winner:''},
+    {label:'R32-9', homeHint:'Brazil',            awayHint:'Japan',                 date:'Mon Jun 29',time:'1:00 PM ET', venue:'NRG Stadium, Houston',
+      home:{name:'Brazil',       flag:'🇧🇷',score:''},away:{name:'Japan',         flag:'🇯🇵',score:''},winner:''},
+    {label:'R32-10',homeHint:'Ivory Coast',       awayHint:'Norway',                date:'Tue Jun 30',time:'1:00 PM ET', venue:'AT&T Stadium, Arlington',
+      home:{name:'Ivory Coast',  flag:'🇨🇮',score:''},away:{name:'Norway',        flag:'🇳🇴',score:''},winner:''},
+    {label:'R32-11',homeHint:'Spain',             awayHint:'Austria',               date:'Thu Jul 2', time:'3:00 PM ET', venue:'SoFi Stadium, Los Angeles',
+      home:{name:'Spain',        flag:'🇪🇸',score:''},away:{name:'Austria',       flag:'🇦🇹',score:''},winner:''},
+    {label:'R32-12',homeHint:'Portugal',          awayHint:'Croatia',               date:'Thu Jul 2', time:'7:00 PM ET', venue:'BMO Field, Toronto',
+      home:{name:'Portugal',     flag:'🇵🇹',score:''},away:{name:'Croatia',       flag:'🇭🇷',score:''},winner:''},
+    {label:'R32-13',homeHint:'Switzerland',       awayHint:'Algeria',               date:'Thu Jul 2', time:'11:00 PM ET',venue:'BC Place, Vancouver',
+      home:{name:'Switzerland',  flag:'🇨🇭',score:''},away:{name:'Algeria',       flag:'🇩🇿',score:''},winner:''},
+    {label:'R32-14',homeHint:'Australia',         awayHint:'Egypt',                 date:'Fri Jul 3', time:'2:00 PM ET', venue:'AT&T Stadium, Arlington',
+      home:{name:'Australia',    flag:'🇦🇺',score:''},away:{name:'Egypt',         flag:'🇪🇬',score:''},winner:''},
+    {label:'R32-15',homeHint:'Argentina',         awayHint:'Cape Verde',            date:'Fri Jul 3', time:'6:00 PM ET', venue:'Hard Rock Stadium, Miami',
+      home:{name:'Argentina',    flag:'🇦🇷',score:''},away:{name:'Cape Verde',    flag:'🇨🇻',score:''},winner:''},
+    {label:'R32-16',homeHint:'Colombia',          awayHint:'Ghana',                 date:'Fri Jul 3', time:'9:30 PM ET', venue:'Arrowhead Stadium, Kansas City',
+      home:{name:'Colombia',     flag:'🇨🇴',score:''},away:{name:'Ghana',         flag:'🇬🇭',score:''},winner:''},
   ],
   r16:[
     km('R16-1','Winner R32-1','Winner R32-3','Sat Jul 5','1:00 PM ET','NRG Stadium, Houston'),
@@ -765,7 +775,13 @@ function buildBracket(){
 
   const ctr=document.createElement('div'); ctr.className='bcol-center';
   ctr.innerHTML=`<div class="trophy-col">
-    <span class="trophy-emoji">🏆</span>
+    <div class="trophy-img-wrap">
+      <img class="trophy-img" id="trophyImg"
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/FIFA_World_Cup_Trophy_2010.jpg/200px-FIFA_World_Cup_Trophy_2010.jpg"
+        alt="FIFA World Cup Trophy"
+        onerror="this.onerror=null;this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/FIFA_World_Cup_Trophy_2010.jpg/200px-FIFA_World_Cup_Trophy_2010.jpg';this.onerror=function(){this.style.display='none';document.getElementById('trophyFallback').style.display='block';}">
+      <span class="trophy-fallback" id="trophyFallback">🏆</span>
+    </div>
     <div class="final-lbl">FINAL</div>
     <div class="final-venue">Jul 19 · 3:00 PM ET<br>MetLife Stadium, NJ</div>
   </div>
