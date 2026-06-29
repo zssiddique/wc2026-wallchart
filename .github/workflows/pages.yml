@@ -26,6 +26,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
       - name: Fetch live scores (tries 3 sources)
         run: |
           set +e  # don't fail whole job if one source fails
@@ -56,7 +61,7 @@ jobs:
             exit 0
           fi
 
-          python3 << PYEOF
+          python <<'PY'
 import json, datetime, sys
 
 with open('/tmp/raw.json') as f:
