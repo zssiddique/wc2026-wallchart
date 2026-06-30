@@ -182,15 +182,12 @@ header h1 em{color:var(--gold);font-style:normal;}
 <div class="toolbar">
   <span id="saveOk" class="save-ok hide">✓ Saved</span>
   <div class="live-status">
-    <span class="live-dot" id="liveDot"></span>
-    <span id="liveLabel">Connecting…</span>
+    <span class="live-dot ok"></span>
+    <span id="liveLabel" class="ok">Updated manually</span>
   </div>
-  <span id="lastUpdated" class="tip"></span>
-  <button class="btn btn-sync" onclick="fetchLive(true)">⟳ Sync Now</button>
-  <button class="btn btn-auto" id="autoBtn" onclick="toggleAuto()">⏸ Auto: ON</button>
+  <span class="tip">Last refreshed: <strong id="lastUpdatedStamp">July 1, 2026</strong></span>
   <button class="btn" onclick="confirmReset()">↺ Reset</button>
 </div>
-<div id="syncBanner" class="sync-banner hide"></div>
 
 <div class="legend">
   <div class="leg"><div class="ld" style="background:var(--green)"></div>Qualified / Advanced</div>
@@ -439,7 +436,7 @@ const KD_DEFAULT = {
     {label:'R32-1', homeHint:'Canada',           awayHint:'South Africa',          date:'Sun Jun 28',time:'3:00 PM ET', venue:'SoFi Stadium, Los Angeles',
       home:{name:'Canada',       flag:'🇨🇦',score:'1'},away:{name:'South Africa', flag:'🇿🇦',score:'0'},winner:'home'},
     {label:'R32-2', homeHint:'Germany',           awayHint:'Paraguay',              date:'Mon Jun 29',time:'4:30 PM ET', venue:'Gillette Stadium, Boston',
-      home:{name:'Germany',      flag:'🇩🇪',score:'1 (3)'},away:{name:'Paraguay',      flag:'🇵🇾',score:'1 (4)'},winner:'away'},
+      home:{name:'Germany',      flag:'🇩🇪',score:'1 (3 pen)'},away:{name:'Paraguay',      flag:'🇵🇾',score:'1 (4 pen)'},winner:'away'},
     {label:'R32-3', homeHint:'Netherlands',       awayHint:'Morocco',               date:'Mon Jun 29',time:'9:00 PM ET', venue:'Estadio BBVA, Monterrey',
       home:{name:'Netherlands',  flag:'🇳🇱',score:''},away:{name:'Morocco',       flag:'🇲🇦',score:''},winner:''},
     {label:'R32-4', homeHint:'France',            awayHint:'Sweden',                date:'Tue Jun 30',time:'5:00 PM ET', venue:'MetLife Stadium, NJ',
@@ -857,178 +854,6 @@ function confirmReset(){
   buildGroups(); toast('Reset ✓');
 }
 
-// ═══════════════════════════════════════
-//  LIVE FEED  v4
-// ═══════════════════════════════════════
-const SOURCES=[
-  {name:'worldcup26.ir',  url:'https://worldcup26.ir/get/games',                                                          parse:parseWC26IR},
-  {name:'wcup2026.org',   url:'https://wcup2026.org/api/data.php?action=results',                                         parse:parseWC2026Org},
-  {name:'openfootball',   url:'https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json',   parse:parseOFB},
-  {name:'scores.json',    url:'scores.json?t='+Date.now(),                                                                 parse:parseCache},
-];
-
-let autoSync=true, syncTimer=null;
-const POLL=60000;
-
-const NM={'United States':'USA','United States of America':'USA',
-  'Bosnia-Herzegovina':'Bosnia & Herz.','Bosnia & Herzegovina':'Bosnia & Herz.',
-  "Côte d'Ivoire":'Ivory Coast',"Cote d'Ivoire":'Ivory Coast',
-  'Cape Verde Islands':'Cape Verde','Cabo Verde':'Cape Verde',
-  'Democratic Republic of Congo':'DR Congo','Congo DR':'DR Congo',
-  'Korea Republic':'South Korea','Republic of Korea':'South Korea',
-  'Czech Republic':'Czechia','Turkey':'Türkiye',
-  'Iran (Islamic Republic of)':'Iran'};
-function norm(n){return n?(NM[n]||n):n;}
-function nm(a,b){
-  if(!a||!b) return false;
-  a=norm(a).toLowerCase().trim(); b=norm(b).toLowerCase().trim();
-  if(a===b) return true;
-  if(a.length>4&&b.length>4&&(a.includes(b)||b.includes(a))) return true;
-  const abb={'usa':'united states','kor':'south korea','ger':'germany','bra':'brazil',
-    'arg':'argentina','fra':'france','esp':'spain','ned':'netherlands','por':'portugal',
-    'nor':'norway','col':'colombia','sui':'switzerland','mex':'mexico','can':'canada',
-    'eng':'england','aus':'australia','jpn':'japan','mar':'morocco','rsa':'south africa',
-    'bih':'bosnia & herz.','civ':'ivory coast','egy':'egypt','bel':'belgium',
-    'iri':'iran','tur':'türkiye','sco':'scotland','sen':'senegal',
-    'cpv':'cape verde','ury':'uruguay','ecu':'ecuador','cro':'croatia'};
-  if(abb[a]===b||abb[b]===a) return true;
-  return false;
-}
-
-function setStatus(state,lbl){
-  document.getElementById('liveDot').className='live-dot '+state;
-  const el=document.getElementById('liveLabel');
-  el.className=state; el.textContent=lbl;
-}
-function showBanner(msg,err){
-  const b=document.getElementById('syncBanner');
-  b.textContent=msg; b.className='sync-banner'+(err?' err':'');
-  clearTimeout(showBanner._t);
-  showBanner._t=setTimeout(()=>b.className='sync-banner hide',6000);
-}
-function stampTime(){
-  document.getElementById('lastUpdated').textContent=
-    'Updated '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-}
-function toggleAuto(){
-  autoSync=!autoSync;
-  document.getElementById('autoBtn').textContent=autoSync?'⏸ Auto: ON':'▶ Auto: OFF';
-  autoSync?schedule():clearTimeout(syncTimer);
-}
-function schedule(){clearTimeout(syncTimer);if(autoSync)syncTimer=setTimeout(()=>fetchLive(false),POLL);}
-
-async function fetchTimeout(url,ms=7000){
-  const c=new AbortController();
-  const t=setTimeout(()=>c.abort(),ms);
-  try{const r=await fetch(url,{signal:c.signal,cache:'no-store'});clearTimeout(t);
-    if(!r.ok)throw new Error('HTTP '+r.status);return await r.json();}
-  catch(e){clearTimeout(t);throw e;}
-}
-
-function applyGroupScore(hn,an,hs,as_){
-  for(const g of groupData){
-    for(const m of g.matches){
-      const fwd=nm(m.h,hn)&&nm(m.a,an);
-      const rev=nm(m.h,an)&&nm(m.a,hn);
-      if(!fwd&&!rev) continue;
-      const [nh,na]=fwd?[hs,as_]:[as_,hs];
-      if(m.hs===nh&&m.as===na) return false;
-      m.hs=nh; m.as=na; recalcGroup(g); persist(); return true;
-    }
-  }
-  return false;
-}
-function applyKOScore(hn,an,hs,as_){
-  for(const round of Object.keys(koData)){
-    for(const m of koData[round]){
-      const hok=m.home.name&&nm(m.home.name,hn);
-      const aok=m.away.name&&nm(m.away.name,an);
-      const hrev=m.home.name&&nm(m.home.name,an);
-      const arev=m.away.name&&nm(m.away.name,hn);
-      if((hok&&aok)||(hrev&&arev)){
-        const [nh,na]=(hok&&aok)?[hs,as_]:[as_,hs];
-        if(m.home.score==String(nh)&&m.away.score==String(na)) return false;
-        m.home.score=String(nh); m.away.score=String(na);
-        if(nh!==na) m.winner=nh>na?'home':'away';
-        persist(); return true;
-      }
-    }
-  }
-  return false;
-}
-
-function parseAny(matches,getH,getA,getHS,getAS,getStage){
-  let g=0,k=0;
-  matches.forEach(m=>{
-    const hn=norm(getH(m)||''), an=norm(getA(m)||'');
-    const hs=parseInt(getHS(m)??-1), as_=parseInt(getAS(m)??-1);
-    if(hs<0||as_<0||!hn||!an) return;
-    const stage=(getStage(m)||'').toLowerCase();
-    const isKO=stage&&(stage.includes('round')||stage.includes('quarter')||stage.includes('semi')||stage.includes('final')||stage.includes('knockout'));
-    if(isKO){if(applyKOScore(hn,an,hs,as_))k++;}
-    else{if(applyGroupScore(hn,an,hs,as_))g++;}
-  });
-  return g+k;
-}
-function parseWC26IR(json){
-  const list=Array.isArray(json)?json:(json.games||json.matches||[]);
-  return parseAny(list.filter(m=>{const s=(m.status||m.matchStatus||'').toLowerCase();return s!=='scheduled'&&s!=='tbd';}),
-    m=>m.homeTeam?.name||m.home?.name||m.home||'',
-    m=>m.awayTeam?.name||m.away?.name||m.away||'',
-    m=>m.homeScore??m.home_score??(m.score?.home??-1),
-    m=>m.awayScore??m.away_score??(m.score?.away??-1),
-    m=>m.stage||m.round||m.phase||'');
-}
-function parseWC2026Org(json){
-  const list=json.matches||json.results||json.data||json||[];
-  return parseAny(Array.isArray(list)?list:[],
-    m=>m.home_team||m.home||'', m=>m.away_team||m.away||'',
-    m=>m.home_score??m.score_home??-1, m=>m.away_score??m.score_away??-1,
-    m=>m.stage||m.round||'');
-}
-function parseOFB(json){
-  let n=0;
-  (json.rounds||[]).forEach(r=>{
-    const isKO=r.name&&(r.name.toLowerCase().includes('round')||r.name.toLowerCase().includes('quarter')||r.name.toLowerCase().includes('semi')||r.name.toLowerCase().includes('final'));
-    (r.matches||[]).forEach(m=>{
-      if(!m.score?.ft) return;
-      const [hs,as_]=m.score.ft;
-      const hn=norm(typeof m.team1==='object'?m.team1.name:m.team1||'');
-      const an=norm(typeof m.team2==='object'?m.team2.name:m.team2||'');
-      if(isKO){if(applyKOScore(hn,an,hs,as_))n++;}
-      else{if(applyGroupScore(hn,an,hs,as_))n++;}
-    });
-  });
-  return n;
-}
-function parseCache(json){
-  let n=0;
-  (json.matches||[]).forEach(m=>{if(applyGroupScore(norm(m.home),norm(m.away),m.hs,m.as_))n++;});
-  (json.knockout||[]).forEach(m=>{if(applyKOScore(norm(m.home),norm(m.away),m.hs,m.as_))n++;});
-  return n;
-}
-
-async function fetchLive(manual){
-  if(manual) setStatus('live','Syncing…');
-  for(const src of SOURCES){
-    try{
-      const json=await fetchTimeout(src.url);
-      const n=src.parse(json);
-      setStatus('ok','● '+src.name); stampTime();
-      if(n>0){
-        showBanner('✓ '+n+' score'+(n>1?'s':'')+' updated from '+src.name);
-        buildGroups();
-        if(document.getElementById('panel-bracket').classList.contains('on')) buildBracket();
-      } else if(manual){
-        showBanner('✓ All scores up to date ('+src.name+')');
-      }
-      schedule(); return;
-    }catch(e){console.warn('[WC26] '+src.name+' failed:',e.message);}
-  }
-  setStatus('err','Offline');
-  if(manual) showBanner('⚠ All live sources unreachable. Using saved data.',true);
-  schedule();
-}
 
 // ═══════════════════════════════════════
 //  INIT
@@ -1036,7 +861,6 @@ async function fetchLive(manual){
 loadState();
 groupData.forEach(g=>recalcGroup(g));
 buildGroups();
-fetchLive(false);
 </script>
 </body>
 </html>

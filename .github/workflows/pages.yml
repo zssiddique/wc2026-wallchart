@@ -3,12 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  schedule:
-    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -17,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  fetch-and-deploy:
+  deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -25,33 +23,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Fetch live scores
-        run: |
-          set +e
-          URL="https://worldcup26.ir/get/games"
-          HTTP_CODE=$(curl -s --max-time 10 -o /tmp/raw.json -w "%{http_code}" \
-            "$URL" -H "Accept: application/json" -H "User-Agent: Mozilla/5.0")
-          echo "worldcup26.ir responded with HTTP $HTTP_CODE"
-
-          if [ "$HTTP_CODE" = "200" ] && [ -s /tmp/raw.json ]; then
-            python3 .github/scripts/fetch_scores.py worldcup26.ir
-          else
-            echo "Source unreachable, keeping existing scores.json"
-          fi
-
-      - name: Commit scores.json if changed
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add scores.json
-          git diff --staged --quiet || git commit -m "Update scores.json [skip ci]"
-          git push || true
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

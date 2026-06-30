@@ -1,59 +1,73 @@
-# 🏆 FIFA World Cup 2026 – Live Wall Chart
+# 🏆 FIFA World Cup 2026 – Wall Chart
 
-**➡ [Open Live Wall Chart](https://YOUR-USERNAME.github.io/wc2026-wallchart/)**
+**➡ [Open Wall Chart](https://YOUR-USERNAME.github.io/wc2026-wallchart/)**
 
----
-
-## 📡 Live feed — how it actually works
-
-Previous versions tried ESPN via CORS proxies. Those are unreliable.
-This version uses **4 sources that are genuinely browser-safe** (all serve `Access-Control-Allow-Origin: *`):
-
-| Priority | Source | Type | Notes |
-|----------|--------|------|-------|
-| 1st | `worldcup26.ir/get/games` | Purpose-built WC2026 API | CORS enabled, no key |
-| 2nd | `wcup2026.org/api/data.php` | Community PHP project | CORS enabled, no key |
-| 3rd | `openfootball` GitHub raw JSON | Static file on GitHub | Always CORS-open |
-| 4th | `scores.json` in this repo | Your own GitHub Pages file | Same origin, zero CORS |
-
-**The 4th source is the safety net** — GitHub Actions fetches scores every 5 minutes server-side (no CORS) and saves `scores.json` into this repo. Your browser loads it from the same domain. It always works.
+An interactive bracket and group-stage wall chart for the 2026 FIFA World Cup.
 
 ---
 
-## 🚀 Deploy to GitHub Pages (5 minutes)
+## How this works
 
-### Step 1 — Create repo
-1. Go to **[github.com/new](https://github.com/new)**
-2. Name: `wc2026-wallchart` · Set to **Public** · No checkboxes · **Create**
+There is no live score API. After investigating several "free" World Cup
+score feeds, none of them are reliable, properly documented, or accessible
+from a browser (CORS-blocked). Rather than show a fake "Live" indicator
+that never actually connects, this wall chart uses **accurate static data
+that gets updated by hand** each time results come in.
 
-### Step 2 — Upload files
-1. Click **"uploading an existing file"**
-2. Unzip the downloaded package
-3. On **Mac**: press `Cmd+Shift+.` to show hidden files, then drag everything in
-4. On **Windows**: View → tick "Hidden items", then drag everything in
-5. Commit
-
-### Step 3 — Enable GitHub Pages
-Settings → Pages → Source: **GitHub Actions** → Save
-
-### Step 4 — Done!
-`https://YOUR-USERNAME.github.io/wc2026-wallchart/`
+**To get fresh scores:** just ask in chat for an update and the data in
+`index.html` will be refreshed with the latest confirmed results, then
+re-deployed.
 
 ---
 
 ## ✨ Features
-- Auto-syncs live scores every 60 seconds
-- 4-source fallback chain — if one fails, tries the next instantly
-- All 12 groups with live standings
-- TV-style left/right knockout bracket
-- Click any score or team to edit manually
-- Saves to browser storage automatically
-- Mobile friendly
+
+- 🏟 All 12 groups with full standings (MP, W, D, L, GF, GA, GD, PTS)
+- 🏆 Full TV-style bracket — Round of 32 through the Final
+- ✏️ Fully editable — click any score or team name to override
+- 💾 Saves to your browser automatically (localStorage)
+- 🖼 Real World Cup trophy image embedded directly in the page
+- 📱 Mobile friendly
+
+---
+
+## 🚀 Deploy to GitHub Pages
+
+### 1. Create a repository
+Go to [github.com/new](https://github.com/new) → name it `wc2026-wallchart` →
+**Public** → Create.
+
+### 2. Upload files
+Click **"uploading an existing file"**, drag in everything from this
+package (including the hidden `.github` folder — press `Cmd+Shift+.` on
+Mac to reveal it), then commit.
+
+### 3. Enable Pages
+Settings → Pages → Source: **GitHub Actions** → Save.
+
+### 4. Done
+Live in about a minute at:
+```
+https://YOUR-USERNAME.github.io/wc2026-wallchart/
+```
+
+---
+
+## ⚠️ If you see "Invalid workflow file"
+
+GitHub sometimes auto-creates a second workflow called `static.yml` when
+Pages is first enabled. If you have both `static.yml` and `pages.yml` in
+`.github/workflows/`, delete `static.yml` — only `pages.yml` is needed.
+
+---
 
 ## 📁 Files
+
 ```
-index.html          ← Entire wall chart (single file)
-scores.json         ← Auto-updated by GitHub Actions every 5 min
+index.html   ← entire wall chart (single file, no dependencies)
 README.md
-.github/workflows/pages.yml   ← Fetches scores + deploys
+.github/workflows/pages.yml   ← deploys to GitHub Pages on every push
 ```
+
+## 📜 License
+MIT — free to use, share, modify.
